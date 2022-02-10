@@ -45,24 +45,41 @@ class Question:
         return Question.demander_reponse_numerique_utlisateur(min, max)
     
 class Questionnaire:
-    def __init__(self, questions):
+    def __init__(self, questions, category, title, level):
         self.questions = questions
+        self.category = category
+        self.title = title
+        self.level = level
 
     def lancer(self):
         score = 0
+        question_num = 1
+
+        print('--------------------------------------------')
+        print(f'QUESTIONNAIRE: {self.title}')
+        print(f'Catégorie: {self.category}')
+        print(f'Difficulté: {self.level}')
+        print(f'Nombre de questions: {len(self.questions)}')
+        print('--------------------------------------------')
+
         for question in self.questions:
+            print(f'Question {question_num}/{len(self.questions)}')
             if question.poser():
                 score += 1
+            question_num += 1
         print("Score final :", score, "sur", len(self.questions))
         return score
 
-
+    def from_json_data(data):
+        questionary_data_question = data['questions']
+        questions = [Question.FromJsonData(i) for i in questionary_data_question]
+        return Questionnaire(questions, data['categorie'], data['titre'], data['difficulte'])
 
 
 json_file = open('cinema_harrypotter_confirme.json', 'r')
 json_data = json_file.read()
 json_file.close()
 questionary_data = json.loads(json_data)
-questionary_data_question = questionary_data['questions']
-q = Question.FromJsonData(questionary_data_question[0])
-q.poser()
+
+
+Questionnaire.from_json_data(questionary_data).lancer()
