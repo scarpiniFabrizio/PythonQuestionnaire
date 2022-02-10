@@ -1,4 +1,5 @@
 import json
+import sys
 
 class Question:
     def __init__(self, titre, choix, bonne_reponse):
@@ -43,14 +44,12 @@ class Question:
         except:
             print("ERREUR : Veuillez rentrer uniquement des chiffres")
         return Question.demander_reponse_numerique_utlisateur(min, max)
-    
 class Questionnaire:
     def __init__(self, questions, category, title, level):
         self.questions = questions
         self.category = category
         self.title = title
         self.level = level
-
     def lancer(self):
         score = 0
         question_num = 1
@@ -69,17 +68,29 @@ class Questionnaire:
             question_num += 1
         print("Score final :", score, "sur", len(self.questions))
         return score
-
     def from_json_data(data):
         questionary_data_question = data['questions']
         questions = [Question.FromJsonData(i) for i in questionary_data_question]
         return Questionnaire(questions, data['categorie'], data['titre'], data['difficulte'])
+    def from_json_file(filename):
+        try:
+            json_file = open(filename, 'r')
+            json_data = json_file.read()
+            json_file.close()
+            questionary_data = json.loads(json_data)
+        except:
+            print('ERREUR: Ce format n\'est pas correct. Vous devez entrer un fichier au format ".json"')
+            return None
+        return Questionnaire.from_json_data(questionary_data)
+        
 
+# Questionnaire.from_json_file('cinema_harrypotter_expert.json').lancer()
 
-json_file = open('cinema_harrypotter_confirme.json', 'r')
-json_data = json_file.read()
-json_file.close()
-questionary_data = json.loads(json_data)
+if len(sys.argv) < 2:
+    print('ERREUR: Vous devez entrer un nom de fichier pour lancer le questionnaire.')
+    exit(0)
 
-
-Questionnaire.from_json_data(questionary_data).lancer()
+json_file_name = sys.argv[1]
+questionnaire = Questionnaire.from_json_file(json_file_name)
+if questionnaire:
+    questionnaire.lancer()
