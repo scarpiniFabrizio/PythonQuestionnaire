@@ -69,8 +69,21 @@ class Questionnaire:
         print("Score final :", score, "sur", len(self.questions))
         return score
     def from_json_data(data):
+        if not data.get('questions'):
+            return None
+            
         questionary_data_question = data['questions']
         questions = [Question.FromJsonData(i) for i in questionary_data_question]
+
+        if not data.get('categorie'):
+            data['categorie'] = 'inconnu'
+        if not data.get('difficulte'):
+            data['difficulte'] = 'inconnu'
+        if not data.get('titre'):
+            return None
+        
+        
+
         return Questionnaire(questions, data['categorie'], data['titre'], data['difficulte'])
     def from_json_file(filename):
         try:
@@ -84,13 +97,14 @@ class Questionnaire:
         return Questionnaire.from_json_data(questionary_data)
         
 
-# Questionnaire.from_json_file('cinema_harrypotter_expert.json').lancer()
+if __name__ == '__main__':
+    # Questionnaire.from_json_file('cinema_harrypotter_expert.json').lancer()
 
-if len(sys.argv) < 2:
-    print('ERREUR: Vous devez entrer un nom de fichier pour lancer le questionnaire.')
-    exit(0)
+    if len(sys.argv) < 2:
+        print('ERREUR: Vous devez entrer un nom de fichier pour lancer le questionnaire.')
+        exit(0)
 
-json_file_name = sys.argv[1]
-questionnaire = Questionnaire.from_json_file(json_file_name)
-if questionnaire:
-    questionnaire.lancer()
+    json_file_name = sys.argv[1]
+    questionnaire = Questionnaire.from_json_file(json_file_name)
+    if questionnaire:
+        questionnaire.lancer()
